@@ -1,0 +1,14 @@
+{
+  "name": "github-analyzer",
+  "version": "3.0.0",
+  "description": "GitHub Repository Analyzer with Gemini AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0"
+  }
+}

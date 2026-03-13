@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>GitHub Project Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="css/style.css"/>
+
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HOME SCREEN
+════════════════════════════════════════════════════════════ -->
+<div id="home-screen" class="screen active">
+  <div class="bg-grid"></div>
+
+  <nav class="top-nav">
+    <div class="nav-brand">
+      <span class="brand-hex">⬡</span>
+      <div>
+        <div class="brand-title">GitHub Project Analyzer</div>
+        <div class="brand-sub">Understand any GitHub repository instantly</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="nav-a">Get Gemini Key</a>
+      <a href="https://github.com/settings/tokens"     target="_blank" rel="noopener" class="nav-a">GitHub Token</a>
+    </div>
+  </nav>
+
+  <main class="home-main">
+    <div class="home-pill">
+      <span class="pill-dot"></span>Powered by Gemini AI + GitHub API
+    </div>
+
+    <h1 class="home-heading">
+      Analyze any<br>
+      <span class="heading-accent">GitHub repository</span><br>
+      in seconds.
+    </h1>
+    <p class="home-desc">
+      Paste a repo URL and get a full dashboard — tech stack, health score,
+      activity, file tree, and an AI assistant that knows the codebase.
+    </p>
+
+    <div class="home-form">
+      <div class="url-row">
+        <div class="url-field">
+          <svg class="url-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+          </svg>
+          <input id="repo-url" type="text" class="url-input"
+            placeholder="https://github.com/owner/repository"
+            autocomplete="off" spellcheck="false"/>
+        </div>
+        <button id="analyze-btn" class="btn-analyze" type="button">
+          Analyze Repository <span class="btn-arr">→</span>
+        </button>
+      </div>
+
+      <div class="token-section">
+        <button id="token-toggle" class="token-toggle" type="button">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Optional: add GitHub token for higher API rate limits
+        </button>
+        <div id="token-wrap" class="token-wrap" hidden>
+          <input id="token-input" type="password" class="token-input" placeholder="ghp_xxxxxxxxxxxxxxxx"/>
+        </div>
+      </div>
+
+      <div class="chips-row">
+        <span class="chips-label">Try:</span>
+        <button class="chip" data-url="https://github.com/vercel/next.js" type="button">vercel/next.js</button>
+        <button class="chip" data-url="https://github.com/facebook/react" type="button">facebook/react</button>
+        <button class="chip" data-url="https://github.com/expressjs/express" type="button">expressjs/express</button>
+        <button class="chip" data-url="https://github.com/torvalds/linux" type="button">torvalds/linux</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     LOADING SCREEN
+════════════════════════════════════════════════════════════ -->
+<div id="loading-screen" class="screen">
+  <div class="loader-wrap">
+    <div class="loader-ring"></div>
+    <div class="loader-steps">
+      <div class="lstep" id="ls1"><span class="ldot"></span>Fetching repository metadata</div>
+      <div class="lstep" id="ls2"><span class="ldot"></span>Analyzing tech stack &amp; languages</div>
+      <div class="lstep" id="ls3"><span class="ldot"></span>Counting commits &amp; contributors</div>
+      <div class="lstep" id="ls4"><span class="ldot"></span>Building file tree &amp; health score</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DASHBOARD SCREEN
+════════════════════════════════════════════════════════════ -->
+<div id="dash-screen" class="screen">
+
+  <!-- Top Nav -->
+  <nav class="top-nav sticky-nav">
+    <div class="nav-brand">
+      <span class="brand-hex">⬡</span>
+      <div>
+        <div class="brand-title">GitHub Project Analyzer</div>
+        <div class="brand-sub">Understand any GitHub repository instantly</div>
+      </div>
+    </div>
+    <button id="back-btn" class="btn-back" type="button">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      New Analysis
+    </button>
+  </nav>
+
+  <!-- Repo Header -->
+  <div class="repo-header" id="repo-header"></div>
+
+  <!-- Two-column layout -->
+  <div class="dash-layout">
+
+    <!-- LEFT: main content -->
+    <div class="dash-main" id="dash-main"></div>
+
+    <!-- RIGHT: sticky AI sidebar -->
+    <aside class="dash-sidebar">
+      <div class="ai-panel" id="ai-panel">
+        <div class="ai-panel-head">
+          <div class="ai-panel-title">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+              <path d="M12 6v6l4 2"/>
+            </svg>
+            AI Repository Assistant
+          </div>
+          <div class="ai-status" id="ai-status">
+            <span class="ai-dot" id="ai-dot"></span>
+            <span id="ai-status-txt">Ready</span>
+          </div>
+        </div>
+
+        <div class="ai-messages" id="ai-messages">
+          <div class="ai-welcome" id="ai-welcome">
+            <div class="ai-welcome-icon">⬡</div>
+            <p class="ai-welcome-txt">Ask me anything about this repository</p>
+            <div class="ai-suggestions" id="ai-suggestions">
+              <button class="ai-sug" type="button">Explain this project</button>
+              <button class="ai-sug" type="button">How complex is this repo?</button>
+              <button class="ai-sug" type="button">What technologies are used?</button>
+              <button class="ai-sug" type="button">Is this beginner friendly?</button>
+              <button class="ai-sug" type="button">Summarize the architecture</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-input-row">
+          <input id="ai-input" type="text" class="ai-input"
+            placeholder="Ask about this repository…"
+            autocomplete="off"/>
+          <button id="ai-send" class="ai-send-btn" type="button" aria-label="Send">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M22 2L11 13M22 2L15 22 11 13 2 9l20-7z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- Error Toast -->
+<div id="toast" class="toast" role="alert" aria-live="assertive">
+  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+    <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
+  </svg>
+  <span id="toast-msg"></span>
+</div>
+
+<script src="https://js.puter.com/v2/"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
