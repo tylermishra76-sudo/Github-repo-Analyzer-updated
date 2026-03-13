@@ -5,6 +5,7 @@ const fetch   = require('node-fetch');
 const path    = require('path');
 
 const app  = express();
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const PORT = process.env.PORT || 3000;
 
 // ── GEMINI KEY ────────────────────────────────────────────────────────────────
@@ -106,7 +107,7 @@ function projectSize(commits, contributors) {
 
 app.post('/analyze', async (req, res) => {
   const { url } = req.body;
-  const token   = (req.body.token || '').trim() || null;
+ const token = GITHUB_TOKEN;
 
   if (!url) return res.status(400).json({ error: 'No URL provided.' });
 
